@@ -2,19 +2,36 @@
 # SPDX-License-Identifier: MPL-2.0
 
 provider "aws" {
-  region = "us-west-2"
+  region = "us-west-1"
 }
 
-provider "random" {}
+data "aws_ami" "LinuxWeb" {
 
-resource "random_pet" "name" {}
+  owners = ["amazon"]
+  most_recent = true
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-20240301"]
+   }  
+  
+}
 
-resource "aws_instance" "web" {
-  ami           = "ami-a0cfeed8"
-  instance_type = "t2.micro"
-  user_data     = file("init-script.sh")
+resource "aws_instance" "LinuxWeb" {
 
-  tags = {
-    Name = random_pet.name.id
-  }
+    ami = data.aws_ami.LinuxWeb
+    instance_type = var.instance_type 
+    user_data = file("init-script1.sh") 
+}
+
+variable "instance_type" {
+
+    type        = string
+    description = "WebServerPHP" 
+
+}
+
+output "AMI" {
+
+    value = data.aws_ami.LinuxWeb
+  
 }
